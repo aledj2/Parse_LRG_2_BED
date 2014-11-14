@@ -1,24 +1,19 @@
 def parse_LRG(filepath):
     myLRG = LRG(filepath)
-    #output?    
     
-
 class LRG(object):
             
-    def __init__(self, filepath):
+    def __init__(self, filepath='LRG_292.xml'):
         import xml.etree.ElementTree as etree
-        self.xmlfile = filepath                 #Needs Try/Catch for file doesn't exist
-
+        self.xmlfile = filepath
         try:                                    # try and catch any files which are not .xml
             self.xmlfile=("*.xml")
         except IOError:
             print "Please ensure you have entered a .xml file"
-        
 
         self.tree = etree.parse(self.xmlfile)
         self.root = self.tree.getroot()
-
-        self.id = self.set_id()                 #e.g. "LRG_292"
+        self.id = self.set_id()                 #eg "LRG_292"
         self.sequences = self.set_sequences()   #Dictionary of seqid:sequence
         self.exons = self.set_exons()           #Nested dictionaries of exonnum,refseq,attribute
         self.set_exon_seq()
@@ -38,7 +33,7 @@ class LRG(object):
         Includes genomic, transcript, translation
         e.g. {"LRG_292":"ATCG....", LRG_292t1:"ATCG....", LRG292p1:"AACE"}'''
         sequences = {}                          #dictionary to contain all the sequences
-        sequences.update(self.set_genomic_seq()) # update with the following functions to fill the dictionary
+        sequences.update(self.set_genomic_seq())    # update with the following functions to fill the dictionary
         sequences.update(self.set_cDNA())
         sequences.update(self.set_protein())
         return sequences
@@ -49,11 +44,10 @@ class LRG(object):
         Genomic only
         e.g. {"LRG_292":"ATCG...."}'''
         genomic_id_seq = {}
-        for item in (items for items in self.root[0] if items.tag == 'sequence'):   #Maybe change to self.root.find()
+       for item in (items for items in self.root[0] if items.tag == 'sequence'):   #Maybe change to self.root.find()
             genomic_seq = item.text                                                 # navigate down to the level and select the tag called sequence
         for item in self.tree.iter(tag = 'id'):                                     # extract the sequence to variable genomic seq
             genomic_id = item.text                                                  # extract the ID from Tag ID to variable genomic_ID
-        genomic_id_seq[genomic_id]=genomic_seq                                      # enter the genomic ID (transcript name) and the sequence into the above dictionary
         return genomic_id_seq
 
 
@@ -78,7 +72,9 @@ class LRG(object):
         proteins = {}
         protein_elems = self.root.findall("./fixed_annotation/transcript/coding_region/translation")
         for protein in protein_elems:
+            print protein.tag
             protein_id = self.id + protein.attrib["name"]
+            print type(protein_id)
             for sequence in protein.findall("./sequence"):
                 protein_seq = sequence.text
             proteins[protein_id] = protein_seq
@@ -97,7 +93,6 @@ class LRG(object):
                 print "----------------\n\nExon:" , exon.attrib["label"]
                 exon_number = exon.attrib["label"]
                 for coords in exon.findall('coordinates'):
-                    
                     print "\nReference: ", coords.attrib['coord_system']
                     print "Start: ", coords.attrib['start']
                     print "End: ", coords.attrib['end']
@@ -125,6 +120,9 @@ class LRG(object):
            Saves the sequence in the second nested dictionary in self.exons
                i.e. in addition to keys "Start", "End"
                  now also contains {Sequence":exon sequence} '''
+        output_fasta_file="fasta_fname.fasta" # name of the output fasta file can be changed to accept the filename as an argument
+        f=open(output_fasta_file,"w") #creates an output file. If any data pre-exists it'll wipe the file
+        f.close() # closes the file to prevent it being open while looping through
         if exon_list == None:
             exon_list = self.exons.keys()
             sorted_exon_list = sorted(map(int, exon_list))
@@ -145,6 +143,16 @@ class LRG(object):
                     print "Length:  ", int(exon_end) - int(exon_start) +1
                     adjusted_start = int(exon_start) - upstream
                     adjusted_end = int(exon_end) + downstream
+                    
+                    #get sequence from reference within this range
+                    exon_seq = self.sequences[reference][int(exon_start)-1:int(exon_end)]
+                    #save to nested dicts
+                    self.exons[exon][reference]["Sequence"] = exon_seq
+                        #cache results if time
+                    f=open(output_fasta_file,"a") #opens the file created before
+                    Fasta_str_seq=">"+reference+" Exon: "+exon+"\n"+exon_seq+"\n\n" ## assembles all the info required for the output file
+                    f.write(Fasta_str_seq)
+                    f.close()
                     exon_seq = self.sequences[reference][int(exon_start)-1:int(exon_end)]
                     self.exons[exon][reference]["Sequence"] = exon_seq
                     print "Sequence:", exon_seq, "\n"
@@ -152,12 +160,8 @@ class LRG(object):
                     print "Start:    -"
                     print "End:      -"
                     
-    def select_output(reference, exons, upstream, downstream):
-        a=1
-    
-    def write_fasta(dictionary_of_id_seq):
-        a=1
-
+   
         
     
 #myLRG = LRG()
+
