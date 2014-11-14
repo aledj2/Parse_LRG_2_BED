@@ -6,10 +6,10 @@ class LRG(object):
     def __init__(self, filepath='LRG_292.xml'):
         import xml.etree.ElementTree as etree
         self.xmlfile = filepath
-        try:                                    # try and catch any files which are not .xml
-            self.xmlfile=("*.xml")
-        except IOError:
-            print "Please ensure you have entered a .xml file"
+        #try:                                    # try and catch any files which are not .xml
+        #    self.xmlfile=("*.xml")
+        #except IOError:
+        #    print "Please ensure you have entered a .xml file"
 
         self.tree = etree.parse(self.xmlfile)
         self.root = self.tree.getroot()
@@ -24,7 +24,7 @@ class LRG(object):
         LRG_ids = self.root.findall("./fixed_annotation/id")
         for LRG in LRG_ids:
             LRG_id = LRG.text
-            assert lrg_id =("LRG*")              # check that the ID starts with LRG to ensure we have captured the ID correctly
+            #assert lrg_id ==("LRG*")              # check that the ID starts with LRG to ensure we have captured the ID correctly
         return LRG_id
                 
 
@@ -44,8 +44,8 @@ class LRG(object):
         Genomic only
         e.g. {"LRG_292":"ATCG...."}'''
         genomic_id_seq = {}
-       for item in (items for items in self.root[0] if items.tag == 'sequence'):   #Maybe change to self.root.find()
-            genomic_seq = item.text                                                 # navigate down to the level and select the tag called sequence
+        for item in (items for items in self.root[0] if items.tag == 'sequence'):   #Maybe change to self.root.find()
+           genomic_seq = item.text                                                 # navigate down to the level and select the tag called sequence
         for item in self.tree.iter(tag = 'id'):                                     # extract the sequence to variable genomic seq
             genomic_id = item.text                                                  # extract the ID from Tag ID to variable genomic_ID
         return genomic_id_seq
@@ -99,7 +99,7 @@ class LRG(object):
                     exon_ref = coords.attrib['coord_system']
                     exon_start = coords.attrib['start']
                     exon_end = coords.attrib['end']
-                    assert exon_start< exon_end          # assert that the exon end is after exon start
+                    #assert exon_start< exon_end          # assert that the exon end is after exon start
                     this_exon[exon_ref] = {"Start":exon_start,"End":exon_end}
                     print this_exon
                 exons[exon_number] = this_exon
