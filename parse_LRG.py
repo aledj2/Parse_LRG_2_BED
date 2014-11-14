@@ -5,7 +5,8 @@ class LRG(object):
         self.xmlfile = filepath
         self.tree = etree.parse(self.xmlfile)
         self.root = self.tree.getroot()
-        self.id = self.set_id()
+
+        self.id = self.set_id()     #e.g. "LRG_292"
         self.sequences = self.set_sequences()
         self.exons = self.set_exons()
         #self.references = self.set_references()
