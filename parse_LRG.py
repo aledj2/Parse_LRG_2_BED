@@ -5,9 +5,16 @@ def parse_LRG(filepath):
 
 class LRG(object):
             
-    def __init__(self, filepath='LRG_292.xml'):
+    def __init__(self, filepath):
         import xml.etree.ElementTree as etree
         self.xmlfile = filepath                 #Needs Try/Catch for file doesn't exist
+
+        try:                                    # try and catch any files which are not .xml
+            self.xmlfile=("*.xml")
+        except IOError:
+            print "Please ensure you have entered a .xml file"
+        
+
         self.tree = etree.parse(self.xmlfile)
         self.root = self.tree.getroot()
 
@@ -22,6 +29,7 @@ class LRG(object):
         LRG_ids = self.root.findall("./fixed_annotation/id")
         for LRG in LRG_ids:
             LRG_id = LRG.text
+            assert lrg_id =("LRG*")              # check that the ID starts with LRG to ensure we have captured the ID correctly
         return LRG_id
                 
 
@@ -29,8 +37,8 @@ class LRG(object):
         '''Returns dictionary containing sequence ids as keys, sequences as values from LRG xml
         Includes genomic, transcript, translation
         e.g. {"LRG_292":"ATCG....", LRG_292t1:"ATCG....", LRG292p1:"AACE"}'''
-        sequences = {}
-        sequences.update(self.set_genomic_seq())
+        sequences = {}                          #dictionary to contain all the sequences
+        sequences.update(self.set_genomic_seq()) # update with the following functions to fill the dictionary
         sequences.update(self.set_cDNA())
         sequences.update(self.set_protein())
         return sequences
@@ -41,11 +49,11 @@ class LRG(object):
         Genomic only
         e.g. {"LRG_292":"ATCG...."}'''
         genomic_id_seq = {}
-        for item in (items for items in self.root[0] if items.tag == 'sequence'): #Maybe change to self.root.find()
-            genomic_seq = item.text
-        for item in self.tree.iter(tag = 'id'):
-            genomic_id = item.text
-        genomic_id_seq[genomic_id]=genomic_seq
+        for item in (items for items in self.root[0] if items.tag == 'sequence'):   #Maybe change to self.root.find()
+            genomic_seq = item.text                                                 # navigate down to the level and select the tag called sequence
+        for item in self.tree.iter(tag = 'id'):                                     # extract the sequence to variable genomic seq
+            genomic_id = item.text                                                  # extract the ID from Tag ID to variable genomic_ID
+        genomic_id_seq[genomic_id]=genomic_seq                                      # enter the genomic ID (transcript name) and the sequence into the above dictionary
         return genomic_id_seq
 
 
@@ -89,13 +97,14 @@ class LRG(object):
                 print "----------------\n\nExon:" , exon.attrib["label"]
                 exon_number = exon.attrib["label"]
                 for coords in exon.findall('coordinates'):
+                    
                     print "\nReference: ", coords.attrib['coord_system']
                     print "Start: ", coords.attrib['start']
                     print "End: ", coords.attrib['end']
                     exon_ref = coords.attrib['coord_system']
                     exon_start = coords.attrib['start']
                     exon_end = coords.attrib['end']
-                    
+                    assert exon_start< exon_end          # assert that the exon end is after exon start
                     this_exon[exon_ref] = {"Start":exon_start,"End":exon_end}
                     print this_exon
                 exons[exon_number] = this_exon
