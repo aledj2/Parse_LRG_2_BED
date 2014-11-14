@@ -1,3 +1,8 @@
+def parse_LRG(filepath):
+    myLRG = LRG(filepath)
+    #output?    
+    
+
 class LRG(object):
             
     def __init__(self, filepath='LRG_292.xml'):
@@ -6,9 +11,9 @@ class LRG(object):
         self.tree = etree.parse(self.xmlfile)
         self.root = self.tree.getroot()
         self.id = self.set_id()
-        self.sequences = self.set_sequences()
-        self.exons = self.set_exons()
-        #self.references = self.set_references()
+
+        self.sequences = self.set_sequences()   #Dictionary of seqid:sequence
+        self.exons = self.set_exons()           #Nested dictionaries of exonnum,refseq,attribute
         self.set_exon_seq()
 
     def set_id(self):
@@ -99,31 +104,6 @@ class LRG(object):
         return exons
 
 
-    def set_references(self):
-        '''Returns list of reference sequence names
-           for genomic, transcript, translation sequences
-           Not currently used as redundant (use self.sequences.keys() instead)'''
-    
-        for item in self.tree.iter(tag = 'id'):
-            genomic_id = item.text
-
-        transcript_ids = []
-        for item in self.tree.iter(tag = 'transcript'):
-            if 'name' in item.attrib:
-                transcript_id = genomic_id + item.attrib["name"]
-                transcript_ids.append(transcript_id)
-
-        protein_ids = []
-        for item in self.tree.iter(tag = 'translation'):
-            if 'name' in item.attrib:
-                protein_id = genomic_id + item.attrib["name"]
-                protein_ids.append(protein_id)
-
-        references = [genomic_id]
-        for ids in transcript_ids, protein_ids:
-            references.extend(ids)
-        return references
-
     def get_exon_list(self):
         '''Prints a list of  sorted exon numbers and sequenes they map to within the LRG xml
            E.g. "2 ['LRG_292', 'LRG_292t1', 'LRG_292p1']"    '''
@@ -138,7 +118,7 @@ class LRG(object):
            Saves the sequence in the second nested dictionary in self.exons
                i.e. in addition to keys "Start", "End"
                  now also contains {Sequence":exon sequence} '''
-        output_fasta_file="fasta_fname" # name of the output fasta file can be changed to accept the filename as an argument
+        output_fasta_file="fasta_fname.fasta" # name of the output fasta file can be changed to accept the filename as an argument
         f=open(output_fasta_file,"w") #creates an output file. If any data pre-exists it'll wipe the file
         f.close() # closes the file to prevent it being open while looping through
         if exon_list == None:
@@ -167,11 +147,13 @@ class LRG(object):
                     #save to nested dicts
                     self.exons[exon][reference]["Sequence"] = exon_seq
                         #cache results if time
-                    print "Sequence:", exon_seq, "\n"
                     f=open(output_fasta_file,"a") #opens the file created before
                     Fasta_str_seq=">"+reference+" Exon: "+exon+"\n"+exon_seq+"\n\n" ## assembles all the info required for the output file
                     f.write(Fasta_str_seq)
                     f.close()
+                    exon_seq = self.sequences[reference][int(exon_start)-1:int(exon_end)]
+                    self.exons[exon][reference]["Sequence"] = exon_seq
+                    print "Sequence:", exon_seq, "\n"
                 else:
                     print "Start:    -"
                     print "End:      -"
@@ -184,4 +166,4 @@ class LRG(object):
 
         
     
-myLRG = LRG()
+#myLRG = LRG()
