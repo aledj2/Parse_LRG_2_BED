@@ -75,7 +75,6 @@ class LRG(object):
                     exon_start = coords.attrib['start']
                     exon_end = coords.attrib['end']
                     
-                    #Yo dawg...I heard you like dictionaries...
                     this_exon[exon_ref] = {"Start":exon_start,"End":exon_end}
                     print this_exon
                 exons[exon_number] = this_exon
