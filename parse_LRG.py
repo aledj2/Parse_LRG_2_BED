@@ -1,3 +1,7 @@
+def parse_LRG(filename):
+    myLRG = LRG(filename)
+    print "Fasta file created: " + myLRG.id + ".fasta"
+
  
 class LRG(object):
     '''
@@ -191,9 +195,4 @@ class LRG(object):
                     print "Start:    -"
                     print "End:      -"
 
-        print "Fasta file created: "+output_fasta_file
-   
-        
-    
-myLRG = LRG()
-
+#        print "Fasta file created: "+output_fasta_file
