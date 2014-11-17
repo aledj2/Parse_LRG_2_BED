@@ -1,6 +1,9 @@
 def parse_LRG(filename):
+    '''
+    Produces a .fasta file containing all exons within the LRG xml specified in filename
+    '''
     myLRG = LRG(filename)
-    print "Fasta file created: " + myLRG.id + ".fasta"
+
 
  
 class LRG(object):
@@ -8,7 +11,7 @@ class LRG(object):
     Creates an LRG object from the specified LRG .xml file.
     Generates a fasta file containing exons for all sequences within the LRG
     '''
-    def __init__(self, filepath='LRG_292.xml'):
+    def __init__(self, filepath):
         import xml.etree.ElementTree as etree
         self.xmlfile = filepath
         #try:                                    # try and catch any files which are not .xml
@@ -195,4 +198,4 @@ class LRG(object):
                     print "Start:    -"
                     print "End:      -"
 
-#        print "Fasta file created: "+output_fasta_file
+        print "Fasta file created: "+output_fasta_file
