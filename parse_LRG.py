@@ -5,6 +5,8 @@ def parse_LRG(filename):
     myLRG = LRG(filename)
     return myLRG
 
+parse_LRG($1)
+
  
 class LRG(object):
     '''
@@ -64,10 +66,8 @@ class LRG(object):
         e.g. {"LRG_292":"ATCG...."}'''
         genomic_id_seq = {}
         for item in (items for items in self.root[0] if items.tag == 'sequence'):   #Maybe change to self.root.find()
-            print "for #1"
             genomic_seq = item.text                                                 # navigate down to the level and select the tag called sequence
         for item in self.tree.iter(tag = 'id'):                                     # extract the sequence to variable genomic seq
-            print "for #2"
             genomic_id = item.text                                                  # extract the ID from Tag ID to variable genomic_ID
         genomic_id_seq[genomic_id] = genomic_seq
         return genomic_id_seq
