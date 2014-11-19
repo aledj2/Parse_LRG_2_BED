@@ -1,3 +1,5 @@
+import sys
+
 def parse_LRG(filename):
     '''
     Produces a .fasta file containing all exons within the LRG xml specified in filename
@@ -5,9 +7,7 @@ def parse_LRG(filename):
     myLRG = LRG(filename)
     return myLRG
 
-parse_LRG($1)
 
- 
 class LRG(object):
     '''
     Creates an LRG object from the specified LRG .xml file.
@@ -202,3 +202,6 @@ class LRG(object):
                     print "End:      -"
 
         print "Fasta file created: "+output_fasta_file
+
+assert len(sys.argv) == 2, "Error, incorrect number of arguements provided (1 required)"
+parse_LRG(sys.argv[1])
