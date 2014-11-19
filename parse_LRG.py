@@ -3,7 +3,7 @@ def parse_LRG(filename):
     Produces a .fasta file containing all exons within the LRG xml specified in filename
     '''
     myLRG = LRG(filename)
-
+    return myLRG
 
  
 class LRG(object):
@@ -64,9 +64,12 @@ class LRG(object):
         e.g. {"LRG_292":"ATCG...."}'''
         genomic_id_seq = {}
         for item in (items for items in self.root[0] if items.tag == 'sequence'):   #Maybe change to self.root.find()
-           genomic_seq = item.text                                                 # navigate down to the level and select the tag called sequence
+            print "for #1"
+            genomic_seq = item.text                                                 # navigate down to the level and select the tag called sequence
         for item in self.tree.iter(tag = 'id'):                                     # extract the sequence to variable genomic seq
+            print "for #2"
             genomic_id = item.text                                                  # extract the ID from Tag ID to variable genomic_ID
+        genomic_id_seq[genomic_id] = genomic_seq
         return genomic_id_seq
 
 
@@ -150,7 +153,7 @@ class LRG(object):
            Saves the sequence in the second nested dictionary in self.exons
            i.e. in addition to keys "Start", "End"
            now also contains {Sequence":exon sequence} '''
-        output_fasta_file = self.id+".fasta"                # name of the output fasta file should be taken as an argument
+        output_fasta_file = self.id+".fa"                # name of the output fasta file should be taken as an argument
         f=open(output_fasta_file,"w")                       # creates an output file. If any data pre-exists it'll wipe the file
         f.close()                                           # closes the file to prevent it being open while looping through
 
