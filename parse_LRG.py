@@ -43,7 +43,6 @@ class LRG(object):
             # the assert below doesnt work - try using regex to match string (import re)
             #assert LRG_id == "LRG*", "Error: LRG id not in expected format ('LRG*')"              # check that the ID starts with LRG to ensure we have captured the ID correctly
         return LRG_id
-                
 
 
 
@@ -58,8 +57,7 @@ class LRG(object):
         return sequences
 
         
-
-
+		
     def set_genomic_seq(self):
         '''Returns dictionary containing sequence ids as keys, sequences as values from LRG xml
         Genomic only
@@ -71,7 +69,6 @@ class LRG(object):
             genomic_id = item.text                                                  # extract the ID from Tag ID to variable genomic_ID
         genomic_id_seq[genomic_id] = genomic_seq
         return genomic_id_seq
-
 
 
 
@@ -90,7 +87,6 @@ class LRG(object):
 
 
 
-
     def set_protein(self):
         '''Returns dictionary containing sequence ids as keys, sequences as values from LRG xml
         Proteins from genomic transcripts only
@@ -105,7 +101,6 @@ class LRG(object):
                 protein_seq = sequence.text
             proteins[protein_id] = protein_seq
         return proteins
-
 
 
 
@@ -135,7 +130,6 @@ class LRG(object):
 
 
 
-
     def get_exon_list(self):
         '''Prints a list of sorted exon numbers and sequenes they map to within the LRG xml
            E.g. "Exon 2 ['LRG_292', 'LRG_292t1', 'LRG_292p1']"    '''
@@ -147,12 +141,11 @@ class LRG(object):
             
 
 
-
     def set_exon_seq(self, exon_list = None, upstream = 0, downstream = 0):
         '''Retrieves the exon sequence for each exon/reference sequence combination
            Saves the sequence in the second nested dictionary in self.exons
            i.e. in addition to keys "Start", "End"
-           now also contains {Sequence":exon sequence} '''
+           now also contains {"Sequence":exon sequence} '''
         output_fasta_file = self.id+".fa"                # name of the output fasta file should be taken as an argument
         f=open(output_fasta_file,"w")                       # creates an output file. If any data pre-exists it'll wipe the file
         f.close()                                           # closes the file to prevent it being open while looping through
@@ -173,14 +166,12 @@ class LRG(object):
 
                 #if the exon is present in this sequence then get the exon sequence and write to fasta file
                 if reference in self.exons[exon].keys():
-                    exon_start = self.exons[exon][reference]["Start"]
-                    exon_end = self.exons[exon][reference]["End"]
-                    
-                    #adjusted_start = int(exon_start) - upstream
-                    #adjusted_end = int(exon_end) + downstream
-                    
+                    exon_start = self.exons[exon][reference]["Start"]# -upstream 	Upstream/downstream functionality commented out until assert on adjusted positions within sequence are included
+                    exon_end = self.exons[exon][reference]["End"]    # +downstream
+				
                     #get sequence from reference within this range
                     exon_seq = self.sequences[reference][int(exon_start)-1:int(exon_end)]
+					#assert statement needed here to check seq length == range between exon coords
                     #save to nested dictionaries
                     self.exons[exon][reference]["Sequence"] = exon_seq
 
@@ -203,5 +194,5 @@ class LRG(object):
 
         print "Fasta file created: "+output_fasta_file
 
-assert len(sys.argv) == 2, "Error, incorrect number of arguements provided (1 required)"
+assert len(sys.argv) == 2, "Error, incorrect number of arguments provided (1 required)"
 parse_LRG(sys.argv[1])
