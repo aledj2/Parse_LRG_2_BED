@@ -20,3 +20,12 @@ Further development:
 The code is currently designed to allow retrieval of specific exons from a particular source sequence (eg. genomic sequence, cDNA, protein) by accessing elements of the exon dictionaries. This functionality is currently inaccessible from the terminal. Further development would allow the user to specify these options as further arguments at the terminal.
 
 The set_exon_seq() function which retrieves the exon sequences can accept upstream and downstream flanking ranges, but these are currently defaulted to 0. Further development would enable the user to input desired values via the command line. This functionality is disabled as until further checks on the adjusted positions (i.e they fall within the source sequence) have been implemented (see comments on assert statements).
+
+
+test_parse_LRG.py file:
+This file ensures the file is working as designed and can correctly identify the selected items from a specified XML file.
+
+To use:
+In command line type: python test_parse_LRG.py "LRG_292.xml"
+Any errors will be printed at the end of the on-screen report.
+
