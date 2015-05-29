@@ -27,7 +27,8 @@ class LRG(object):
 
         self.sequences = self.set_sequences()   #Dictionary of seqid:sequence
         self.exons = self.set_exons()           #Nested dictionaries of exon number,reference seq,attribute(start, end, sequence)
-        self.set_exon_seq()
+        print self.exons
+        #self.set_exon_seq()
 
 
 
@@ -52,8 +53,8 @@ class LRG(object):
         e.g. {"LRG_292":"ATCG....", LRG_292t1:"ATCG....", LRG292p1:"AACE"}'''
         sequences = {}                              # dictionary to contain all the sequences
         sequences.update(self.set_genomic_seq())    # update with the following functions to fill the dictionary
-        sequences.update(self.set_cDNA())
-        sequences.update(self.set_protein())
+        #sequences.update(self.set_cDNA())
+        #sequences.update(self.set_protein())
         return sequences
 
         
@@ -72,35 +73,35 @@ class LRG(object):
 
 
 
-    def set_cDNA(self):
-        '''Returns dictionary containing sequence ids as keys, sequences as values from LRG xml
-        Transcripts of genomic sequence only
-        e.g. {"LRG_292t1":"ATCG...."}'''
-        transcripts = {}
-        transcript_elems = self.root.findall("./fixed_annotation/transcript")
-        for transcript in transcript_elems:
-            transcript_id = self.id + transcript.attrib["name"]
-            for sequence in transcript.findall("./cdna/sequence"):
-                transcript_seq = sequence.text
-            transcripts[transcript_id] = transcript_seq
-        return transcripts
-
-
-
-    def set_protein(self):
-        '''Returns dictionary containing sequence ids as keys, sequences as values from LRG xml
-        Proteins from genomic transcripts only
-        e.g. {"LRG_292p1":"AACE...."}'''
-        proteins = {}
-        protein_elems = self.root.findall("./fixed_annotation/transcript/coding_region/translation")
-        for protein in protein_elems:
-            #print protein.tag
-            protein_id = self.id + protein.attrib["name"]
-            #print type(protein_id)
-            for sequence in protein.findall("./sequence"):
-                protein_seq = sequence.text
-            proteins[protein_id] = protein_seq
-        return proteins
+#     def set_cDNA(self):
+#         '''Returns dictionary containing sequence ids as keys, sequences as values from LRG xml
+#         Transcripts of genomic sequence only
+#         e.g. {"LRG_292t1":"ATCG...."}'''
+#         transcripts = {}
+#         transcript_elems = self.root.findall("./fixed_annotation/transcript")
+#         for transcript in transcript_elems:
+#             transcript_id = self.id + transcript.attrib["name"]
+#             for sequence in transcript.findall("./cdna/sequence"):
+#                 transcript_seq = sequence.text
+#             transcripts[transcript_id] = transcript_seq
+#         return transcripts
+# 
+# 
+# 
+#     def set_protein(self):
+#         '''Returns dictionary containing sequence ids as keys, sequences as values from LRG xml
+#         Proteins from genomic transcripts only
+#         e.g. {"LRG_292p1":"AACE...."}'''
+#         proteins = {}
+#         protein_elems = self.root.findall("./fixed_annotation/transcript/coding_region/translation")
+#         for protein in protein_elems:
+#             #print protein.tag
+#             protein_id = self.id + protein.attrib["name"]
+#             #print type(protein_id)
+#             for sequence in protein.findall("./sequence"):
+#                 protein_seq = sequence.text
+#             proteins[protein_id] = protein_seq
+#         return proteins
 
 
 
@@ -141,58 +142,61 @@ class LRG(object):
             
 
 
-    def set_exon_seq(self, exon_list = None, upstream = 0, downstream = 0):
-        '''Retrieves the exon sequence for each exon/reference sequence combination
-           Saves the sequence in the second nested dictionary in self.exons
-           i.e. in addition to keys "Start", "End"
-           now also contains {"Sequence":exon sequence} '''
-        output_fasta_file = self.id+".fa"                # name of the output fasta file should be taken as an argument
-        f=open(output_fasta_file,"w")                       # creates an output file. If any data pre-exists it'll wipe the file
-        f.close()                                           # closes the file to prevent it being open while looping through
+#     def set_exon_seq(self, exon_list = None, upstream = 0, downstream = 0):
+#         '''Retrieves the exon sequence for each exon/reference sequence combination
+#            Saves the sequence in the second nested dictionary in self.exons
+#            i.e. in addition to keys "Start", "End"
+#            now also contains {"Sequence":exon sequence} '''
+#         output_fasta_file = self.id+".fa"                # name of the output fasta file should be taken as an argument
+#         f=open(output_fasta_file,"w")                       # creates an output file. If any data pre-exists it'll wipe the file
+#         f.close()                                           # closes the file to prevent it being open while looping through
+# 
+#         if exon_list == None:                               # if no exon list has been supplied to the function use a sorted list of all exons
+#             exon_list = self.exons.keys()
+#             sorted_exon_list = sorted(map(int, exon_list))
+#             #print sorted_exon_list
+# 
+#         for reference in self.sequences.keys():
+#             print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+#             print "\n\nRef:     ", reference, "\n"
+# 
+#             for exon in sorted_exon_list:
+#                 exon = str(exon)
+#                 print "Ref:     ", reference
+#                 print "Exon:    ", exon
+# 
+#                 #if the exon is present in this sequence then get the exon sequence and write to fasta file
+#                 if reference in self.exons[exon].keys():
+#                     exon_start = self.exons[exon][reference]["Start"]# -upstream 	Upstream/downstream functionality commented out until assert on adjusted positions within sequence are included
+#                     exon_end = self.exons[exon][reference]["End"]    # +downstream
+# 				
+#                     #get sequence from reference within this range
+#                     exon_seq = self.sequences[reference][int(exon_start)-1:int(exon_end)]
+# 					#assert statement needed here to check seq length == range between exon coords
+#                     #save to nested dictionaries
+#                     self.exons[exon][reference]["Sequence"] = exon_seq
+# 
+#                     f = open(output_fasta_file, "a")                                
+#                     fasta_str_seq=">"+reference+" Exon: "+exon+"\n"+exon_seq+"\n\n" # assemble the fasta header and sequence into a string, ready to write to output file
+#                     f.write(fasta_str_seq)
+#                     f.close()
+#                     
+#                     exon_seq = self.sequences[reference][int(exon_start)-1:int(exon_end)] # get the sequence defined by the exon boundries
+#                     self.exons[exon][reference]["Sequence"] = exon_seq                    # save the sequence in the dictionary
+# 
+#                     print "Start:   ", exon_start
+#                     print "End:     ", exon_end
+#                     print "Length:  ", int(exon_end) - int(exon_start) +1
+#                     print "Sequence:", exon_seq, "\n"
+# 
+#                 else:
+#                     print "Start:    -"
+#                     print "End:      -"
+# 
+#         print "Fasta file created: "+output_fasta_file
 
-        if exon_list == None:                               # if no exon list has been supplied to the function use a sorted list of all exons
-            exon_list = self.exons.keys()
-            sorted_exon_list = sorted(map(int, exon_list))
-            #print sorted_exon_list
 
-        for reference in self.sequences.keys():
-            print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-            print "\n\nRef:     ", reference, "\n"
-
-            for exon in sorted_exon_list:
-                exon = str(exon)
-                print "Ref:     ", reference
-                print "Exon:    ", exon
-
-                #if the exon is present in this sequence then get the exon sequence and write to fasta file
-                if reference in self.exons[exon].keys():
-                    exon_start = self.exons[exon][reference]["Start"]# -upstream 	Upstream/downstream functionality commented out until assert on adjusted positions within sequence are included
-                    exon_end = self.exons[exon][reference]["End"]    # +downstream
-				
-                    #get sequence from reference within this range
-                    exon_seq = self.sequences[reference][int(exon_start)-1:int(exon_end)]
-					#assert statement needed here to check seq length == range between exon coords
-                    #save to nested dictionaries
-                    self.exons[exon][reference]["Sequence"] = exon_seq
-
-                    f = open(output_fasta_file, "a")                                
-                    fasta_str_seq=">"+reference+" Exon: "+exon+"\n"+exon_seq+"\n\n" # assemble the fasta header and sequence into a string, ready to write to output file
-                    f.write(fasta_str_seq)
-                    f.close()
-                    
-                    exon_seq = self.sequences[reference][int(exon_start)-1:int(exon_end)] # get the sequence defined by the exon boundries
-                    self.exons[exon][reference]["Sequence"] = exon_seq                    # save the sequence in the dictionary
-
-                    print "Start:   ", exon_start
-                    print "End:     ", exon_end
-                    print "Length:  ", int(exon_end) - int(exon_start) +1
-                    print "Sequence:", exon_seq, "\n"
-
-                else:
-                    print "Start:    -"
-                    print "End:      -"
-
-        print "Fasta file created: "+output_fasta_file
-
-assert len(sys.argv) == 2, "Error, incorrect number of arguments provided (1 required)"
-parse_LRG(sys.argv[1])
+#assert len(sys.argv) == 2, "Error, incorrect number of arguments provided (1 required)"
+file2open="C:\Users\Aled\workspace\Parse_LRG_2_BED\LRG_292.xml"
+#parse_LRG(sys.argv[1])
+parse_LRG(file2open)
