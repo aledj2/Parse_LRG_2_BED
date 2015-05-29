@@ -22,8 +22,16 @@ class parse_LRG:
         self.genename=self.get_gene_name() # get Gene name
         #print self.genename
         
+        self.chromnumber=0
+        self.start_coord=0
+        self.genomebuild="."
+        self.get_chrom_num()
+        print self.chromnumber
+        print self.start_coord
+        print self.genomebuild
+        
         self.exons = self.set_exons()           #Nested dictionaries of exon number,reference seq,attribute(start, end, sequence)
-        parse_LRG().create_bed_file(self.exons,self.genename)
+        parse_LRG().create_bed_file(self.exons,self.genename,self.chromnumber,self.start_coord)
         
         if self.root.attrib['schema_version'] <> '1.8':
             print 'This LRG file is not the correct version for this script'
@@ -52,15 +60,21 @@ class parse_LRG:
             genename = locus.text
             return genename
         
-#     def get_chrom_num(self):
-#         '''
-#         Returns LRG gene string from LRG xml
-#         e.g. "LRG_292"
-#         '''
-#         for chrom in self.tree.iter(tag = 'mapping'):
-#             if 'other_name' in chrom.attrib:
-#                 chrnum= chrom.attrib['other_name']
-#                 print chrnum
+    def get_chrom_num(self):
+        '''
+        Returns LRG gene string from LRG xml
+        e.g. "LRG_292"
+        '''
+
+        mapping = self.root.findall("./updatable_annotation/annotation_set/mapping")
+        #assert len(LRG_locus) == 1                #Check that one LRG was found within the file
+        for line in mapping:
+            if line.attrib['coord_system'] == "GRCh37.p13":
+                #print "hit"
+                self.genomebuild= line.attrib['coord_system']
+                self.chromnumber= line.attrib['other_name']
+                self.start_coord= line.attrib['other_start']
+            
         
     def set_exons(self):
         '''Returns dictionary containing exon numbers as keys, dictionary as values.
@@ -90,15 +104,15 @@ class parse_LRG:
                 
         return exons
     
-    def create_bed_file(self,exon_dict,genename):
+    def create_bed_file(self,exon_dict,genename,chromnumber,startcoord):
         #print exon_dict
         #print len(exon_dict)
         
         for exon in exon_dict:
             exon_number=int(exon)
-            exon_start=exon_dict[exon][0]
-            exon_stop=exon_dict[exon][1]
-            print "Chr \t"+str(exon_start)+"\t"+str(exon_stop)+"\t"+genename+"_exon"+str(exon_number)
+            exon_start=int(exon_dict[exon][0])+int(startcoord)
+            exon_stop=int(exon_dict[exon][1])+int(startcoord)
+            print "Chr"+chromnumber+"\t"+str(exon_start)+"\t"+str(exon_stop)+"\t"+genename+"_exon"+str(exon_number)
 
 file2open="C:\Users\Aled\workspace\Parse_LRG_2_BED\LRG_292.xml"
 parse_LRG().open_XML(file2open)
