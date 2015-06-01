@@ -26,9 +26,9 @@ class parse_LRG:
         self.start_coord=0
         self.genomebuild="."
         self.get_chrom_num()
-        print self.chromnumber
-        print self.start_coord
-        print self.genomebuild
+        #print self.chromnumber
+        #print self.start_coord
+        #print self.genomebuild
         
         self.exons = self.set_exons()           #Nested dictionaries of exon number,reference seq,attribute(start, end, sequence)
         parse_LRG().create_bed_file(self.exons,self.genename,self.chromnumber,self.start_coord)
@@ -112,7 +112,7 @@ class parse_LRG:
             exon_number=int(exon)
             exon_start=int(exon_dict[exon][0])+int(startcoord)
             exon_stop=int(exon_dict[exon][1])+int(startcoord)
-            print "Chr"+chromnumber+"\t"+str(exon_start)+"\t"+str(exon_stop)+"\t"+genename+"_exon"+str(exon_number)
+            print "Chr"+chromnumber+"\t"+str(exon_start)+"\t"+str(exon_stop)+"\t"+genename+"_exon"+str(exon_number)#+"\t exon size: "+str(exon_stop-exon_start)
 
 file2open="C:\Users\Aled\workspace\Parse_LRG_2_BED\LRG_292.xml"
 parse_LRG().open_XML(file2open)
